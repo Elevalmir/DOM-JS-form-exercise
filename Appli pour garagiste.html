@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Appli pour Garagiste</title>
+  <style>
+    /* Définition des styles CSS */
+    body {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      align-items: center;
+      justify-content: center;
+      background-color: #eee;
+    }
+    .form {
+      margin: 20px;
+    }
+    input {
+      width: 450px;
+      height: 23px;
+      margin-bottom: 10px;
+    }
+    .form input[type="submit"] {
+      display: block;
+      margin: 10px auto;
+    }
+    .invalid-input::placeholder {
+      color: red;
+      /* Change la couleur du placeholder pour les champs invalides */
+    }
+  </style>
+</head>
+<body>
+<h1>GARAGISTE</h1>
+
+<div>
+  <!-- Formulaire pour entrer le nombre de jours -->
+  <form id="formJour" class="form">
+    <input type="number" id="jourInput" placeholder="Nombre de jours">
+    <input type="submit" value="Entrer">
+  </form>
+</div>
+<div id="inputContainer"></div>
+<h2 id="resultat"></h2>
+
+<script>
+  // Écouteur pour la soumission du premier formulaire
+  formJour.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    // Nettoyer les résultats précédents
+    inputContainer.innerHTML = "";
+    resultat.textContent = "";
+
+    // Récupérer le nombre de jours saisi
+    const nbJours = parseInt(jourInput.value);
+
+    // Vérifier si le nombre de jours est un nombre pour s'assurer que l'utilisateur n'envoie pas un input non-rempli
+    if (isNaN(nbJours)) {
+      formJour[0].classList.add("invalid-input");
+      formJour[0].setAttribute("placeholder", "Remplissez ce champ");
+      return;
+    }
+
+    // Créer le formulaire pour les entrées des voitures vendues
+    const formulaire = document.createElement("form");
+    formulaire.classList.add("form");
+    formulaire.id = "formNbVoitures";
+    inputContainer.appendChild(formulaire);
+
+    // Générer les champs de saisie en fonction du nombre de jours
+    for (let i = 0; i < nbJours; i++) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.placeholder = "Entrez le nombre de voitures vendues le jour " + (i + 1);
+      formulaire.appendChild(input);
+    }
+
+    // Ajouter le bouton de soumission au formulaire des voitures vendues
+    const formSubmit = document.createElement("input");
+    formSubmit.type = "submit";
+    formSubmit.value = "Calculer";
+    formulaire.appendChild(formSubmit);
+
+    // Écouteur pour la soumission du deuxième formulaire
+    formNbVoitures.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      // Récupérer le formulaire des voitures vendues
+      const formulaire = document.getElementById("formNbVoitures");
+      // Initialisation des varibales pour les calculs
+      let totalVoituresVendues = 0;
+      let valeurMax = parseInt(formulaire[0].value);
+      let indexMax = 0;
+      let valeurMin = parseInt(formulaire[0].value);
+      let indexMin = 0;
+      let allFieldsFilled = true;
+
+      // Parcourir les champs de saisie des voitures vendues
+      for (let index = 0; index < nbJours; index++) {
+        const valeur = parseInt(formulaire[index].value);
+        if (isNaN(valeur)) {
+          formulaire[index].classList.add("invalid-input");
+          formulaire[index].setAttribute("placeholder", "Remplissez ce champ");
+          allFieldsFilled = false;
+        } else {
+          totalVoituresVendues += valeur;
+        }
+
+        if (valeur > valeurMax) {
+          valeurMax = valeur;
+          indexMax = index;
+        }
+
+        if (valeur < valeurMin) {
+          valeurMin = valeur;
+          indexMin = index;
+        }
+      }
+
+      // Si des champs sont vides, afficher un message d'erreur
+      if (!allFieldsFilled) {
+        resultat.textContent = "Remplissez tous les champs";
+        return;
+      }
+
+      // Calculer la moyenne des voitures vendues
+      const moyenne = totalVoituresVendues / nbJours;
+
+      // Afficher les résultats
+      resultat.textContent = "Le nombre total de voitures vendues est " + totalVoituresVendues;
+      resultat.innerHTML += "<br>La moyenne journalière est " + moyenne + "<br>";
+      resultat.innerHTML += "Le meilleur jour de vente est jour " + (indexMax + 1) + "<br>";
+      resultat.innerHTML += "Le plus mauvais jour de vente est jour " + (indexMin + 1) + "<br>";
+    });
+  });
+</script>
+</body>
+</html>
